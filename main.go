@@ -6,7 +6,7 @@ import (
 	"os"
 
 	"tree/tree"
-	"tree/tree/bst"
+	"tree/tree/anibst"
 
 	tea "github.com/charmbracelet/bubbletea"
 )
@@ -24,10 +24,10 @@ func init() {
 
 func main() {
 	// avlTree := avl.NewTree()
-	bstTree := &bst.BST{}
-	for _, i := range []int{4, 5, 6, 1, 2} {
-		// avlTree.Insert(i)
-		bstTree.Insert(i)
+	bstTree := &anibst.Tree{}
+
+	for _, v := range []int{5, 3, 7, 2, 4, 6, 8} {
+		bstTree.Update(anibst.Insert(v))
 	}
 
 	// model := tree.New(avlTree)
