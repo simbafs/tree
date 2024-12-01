@@ -10,3 +10,4 @@ Tree is a project to visuiallize tree like data structure
 # TODO
 
 -   [ ] redesign IsNil
+-   [ ] Animation
