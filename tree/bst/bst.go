@@ -4,8 +4,6 @@ import (
 	"fmt"
 	"strconv"
 	"strings"
-
-	"github.com/charmbracelet/lipgloss"
 )
 
 type BST struct {
@@ -66,10 +64,6 @@ func (node BSTNode) View() string {
 
 func (node BSTNode) Children() []*BSTNode {
 	return []*BSTNode{node.Left, node.Right}
-}
-
-func (node BSTNode) Styling(s lipgloss.Style) lipgloss.Style {
-	return s
 }
 
 // custom methods for BSTNode

@@ -15,7 +15,6 @@ type Tree[T Node[T]] interface {
 type Node[T any] interface {
 	View() string // print the node without border
 	Children() []*T
-	Styling(lipgloss.Style) lipgloss.Style // this method lets node implementation style the node
 }
 
 // Define ModelTree as a generic struct.
@@ -95,7 +94,6 @@ func (node ModelNode[T]) View() string {
 	}
 
 	n := *node.node
-	style = n.Styling(style)
 
 	atLeastOneChild := false
 	children := []string{}
