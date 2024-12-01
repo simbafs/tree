@@ -15,6 +15,7 @@ type Tree[T Node[T]] interface {
 type Node[T any] interface {
 	View() string // print the node without border
 	Children() []*T
+	IsNil() bool
 }
 
 // Define ModelTree as a generic struct.
@@ -89,7 +90,7 @@ func (node ModelNode[T]) View() string {
 		Border(lipgloss.RoundedBorder()).
 		Align(lipgloss.Center)
 
-	if node.node == nil {
+	if node.node == nil || (*node.node).IsNil() {
 		return style.Render("")
 	}
 
@@ -100,7 +101,7 @@ func (node ModelNode[T]) View() string {
 	widthOfChildren := 0
 
 	for _, child := range n.Children() {
-		if child != nil {
+		if child != nil && !(*child).IsNil() {
 			atLeastOneChild = true
 		}
 		c := ModelNode[T]{child}.View()

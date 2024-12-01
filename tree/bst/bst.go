@@ -66,6 +66,10 @@ func (node BSTNode) Children() []*BSTNode {
 	return []*BSTNode{node.Left, node.Right}
 }
 
+func (node BSTNode) IsNil() bool {
+	return false
+}
+
 // custom methods for BSTNode
 
 func (node *BSTNode) Insert(newNode *BSTNode) {
