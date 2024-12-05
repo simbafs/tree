@@ -6,7 +6,7 @@ import (
 	"os"
 
 	"tree/tree"
-	"tree/tree/anibst"
+	"tree/tree/aniavl"
 
 	tea "github.com/charmbracelet/bubbletea"
 )
@@ -23,15 +23,18 @@ func init() {
 }
 
 func main() {
-	// avlTree := avl.NewTree()
-	bstTree := &anibst.Tree{}
+	avlTree := &aniavl.Tree{}
 
-	for _, v := range []int{5, 3, 7, 2, 4, 6, 8} {
-		bstTree.Update(anibst.Insert(v))
-	}
+	root := aniavl.NewNode(5)
+	root.SetLeft(aniavl.NewNode(4))
+	root.SetRight(aniavl.NewNode(6))
+	avlTree.SetRoot(root)
 
-	// model := tree.New(avlTree)
-	model := tree.New(bstTree)
+	// for _, v := range []int{5, 3, 7, 2, 4, 6, 8} {
+	// 	avlTree.Dispatch(fmt.Sprintf("insert %d", v))
+	// }
+
+	model := tree.New(avlTree)
 
 	p := tea.NewProgram(model)
 	if _, err := p.Run(); err != nil {
