@@ -2,7 +2,6 @@ package main
 
 import (
 	"fmt"
-	"log"
 	"os"
 
 	"tree/tree"
@@ -11,18 +10,9 @@ import (
 	tea "github.com/charmbracelet/bubbletea"
 )
 
-func init() {
-	f, err := os.OpenFile("log.txt", os.O_APPEND|os.O_WRONLY|os.O_SYNC|os.O_CREATE, 0o664)
-	if err != nil {
-		panic(err)
-	}
-
-	log.SetOutput(f)
-
-	log.Println("starting...")
-}
-
 func main() {
+	tea.LogToFile("log.txt", "")
+
 	// avlTree := avl.NewTree()
 	bstTree := &bst.BST{}
 	for _, i := range []int{4, 5, 6, 1, 2} {
