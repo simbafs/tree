@@ -4,45 +4,55 @@ import (
 	"fmt"
 	"strconv"
 	"strings"
+
+	"tree/tree"
+
+	tea "github.com/charmbracelet/bubbletea"
 )
 
-type BST struct {
-	RootNode *BSTNode
+type Tree struct {
+	RootNode *Node
 }
+
+var _ tree.Tree[Node, Tree] = &Tree{}
 
 // common methods for Tree
 
-func (t BST) Root() *BSTNode {
+func (t Tree) Root() *Node {
 	return t.RootNode
 }
 
-func (t *BST) Op(cmd string) error {
+func (t Tree) Dispatch(cmd string) (Tree, tea.Cmd) {
 	seg := strings.Fields(cmd)
 	if len(seg) == 0 {
-		return nil
+		return t, nil
 	}
 
 	switch seg[0] {
 	case "insert", "i":
 		if len(seg) < 2 {
-			return fmt.Errorf("insert <key>")
+			return t, tree.ErrMsgf("insert <key>")
 		}
 
 		key, err := strconv.Atoi(seg[1])
 		if err != nil {
-			return err
+			return t, tree.ErrMsg(err)
 		}
 
 		t.Insert(key)
 	}
 
-	return nil
+	return t, nil
+}
+
+func (t Tree) Update(msg tea.Msg) (Tree, tea.Cmd) {
+	return t, nil
 }
 
 // custom methods for BST
 
-func (t *BST) Insert(key int) {
-	newNode := &BSTNode{Key: key}
+func (t *Tree) Insert(key int) {
+	newNode := &Node{Key: key}
 	if t.RootNode == nil {
 		t.RootNode = newNode
 	} else {
@@ -50,29 +60,31 @@ func (t *BST) Insert(key int) {
 	}
 }
 
-type BSTNode struct {
+type Node struct {
 	Key   int
-	Left  *BSTNode
-	Right *BSTNode
+	Left  *Node
+	Right *Node
 }
+
+var _ tree.Node[Node] = &Node{}
 
 // common methods for Node
 
-func (node BSTNode) View() string {
+func (node Node) View() string {
 	return fmt.Sprintf("%d", node.Key)
 }
 
-func (node BSTNode) Children() []*BSTNode {
-	return []*BSTNode{node.Left, node.Right}
+func (node Node) Children() []*Node {
+	return []*Node{node.Left, node.Right}
 }
 
-func (node BSTNode) IsNil() bool {
+func (node Node) IsNil() bool {
 	return false
 }
 
 // custom methods for BSTNode
 
-func (node *BSTNode) Insert(newNode *BSTNode) {
+func (node *Node) Insert(newNode *Node) {
 	if newNode.Key < node.Key {
 		if node.Left == nil {
 			node.Left = newNode

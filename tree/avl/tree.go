@@ -7,13 +7,15 @@ import (
 	"strings"
 
 	"tree/tree"
+
+	tea "github.com/charmbracelet/bubbletea"
 )
 
 type Tree struct {
 	RootNode *Node
 }
 
-var _ tree.Tree[Node] = &Tree{}
+var _ tree.Tree[Node, Tree] = &Tree{}
 
 func NewTree() *Tree {
 	return &Tree{
@@ -23,61 +25,65 @@ func NewTree() *Tree {
 
 // common methods for Tree
 
-func (t *Tree) Root() *Node {
+func (t Tree) Root() *Node {
 	return t.RootNode
 }
 
-func (t *Tree) Op(cmd string) error {
+func (t Tree) Dispatch(cmd string) (Tree, tea.Cmd) {
 	seg := strings.SplitN(cmd, " ", 2)
 	switch seg[0] {
 	case "insert", "i":
 		if len(seg) < 2 {
-			return fmt.Errorf("missing key")
+			return t, tree.ErrMsgf("missing key")
 		}
 
 		key, err := strconv.Atoi(seg[1])
 		if err != nil {
-			return err
+			return t, tree.ErrMsg(err)
 		}
 
-		return t.Insert(key)
+		return t, tree.ErrMsg(t.Insert(key))
 	case "right-rotate", "r":
 		if len(seg) < 2 {
-			return fmt.Errorf("missing key")
+			return t, tree.ErrMsgf("missing key")
 		}
 
-		node, err := searchNode(t, seg[1])
+		node, err := searchNode(&t, seg[1])
 		if err != nil {
-			return err
+			return t, tree.ErrMsg(err)
 		}
 
 		t.ReplaceNode(node.Key, node.RotateRight())
 	case "left-rotate", "l":
 		if len(seg) < 2 {
-			return fmt.Errorf("missing key")
+			return t, tree.ErrMsgf("missing key")
 		}
 
-		node, err := searchNode(t, seg[1])
+		node, err := searchNode(&t, seg[1])
 		if err != nil {
-			return err
+			return t, tree.ErrMsg(err)
 		}
 
 		t.ReplaceNode(node.Key, node.RotateLeft())
 	case "balance", "b":
 		if len(seg) < 2 {
-			return fmt.Errorf("missing key")
+			return t, tree.ErrMsgf("missing key")
 		}
 
-		node, err := searchNode(t, seg[1])
+		node, err := searchNode(&t, seg[1])
 		if err != nil {
-			return err
+			return t, tree.ErrMsg(err)
 		}
 
 		t.ReplaceNode(node.Key, node.Balance())
 	default:
-		return fmt.Errorf("unknown command: %s", cmd)
+		return t, tree.ErrMsgf("unknown command: %s", cmd)
 	}
-	return nil
+	return t, nil
+}
+
+func (t Tree) Update(msg tea.Msg) (Tree, tea.Cmd) {
+	return t, nil
 }
 
 // custom methods for Tree

@@ -7,42 +7,48 @@ import (
 )
 
 // Define Tree and Node interfaces as before.
-type Tree[T Node[T]] interface {
-	Root() *T
-	Op(cmd string) error // pass a command to operate on the tree
+type Tree[N Node[N], T any] interface {
+	Root() *N
+	Dispatch(string) (T, tea.Cmd)
+	Update(tea.Msg) (T, tea.Cmd)
 }
 
-type Node[T any] interface {
+type Node[N any] interface {
 	View() string // print the node without border
-	Children() []*T
-	IsNil() bool
+	Children() []*N
+	IsNil() bool // for some tree like red-black tree, which include Nil node
 }
 
 // Define ModelTree as a generic struct.
-type ModelTree[T Node[T]] struct {
-	tree Tree[T]
+type ModelTree[N Node[N], T Tree[N, T]] struct {
+	tree Tree[N, T]
 	cmd  textinput.Model
 	msg  string
 }
 
-func New[T Node[T]](tree Tree[T]) ModelTree[T] {
+func New[N Node[N], T Tree[N, T]](tree Tree[N, T]) ModelTree[N, T] {
 	cmd := textinput.New()
 	cmd.Focus()
 
-	return ModelTree[T]{
+	return ModelTree[N, T]{
 		tree: tree,
 		cmd:  cmd,
 	}
 }
 
 // Implement Init method for ModelTree.
-func (t ModelTree[T]) Init() tea.Cmd {
+func (t ModelTree[N, T]) Init() tea.Cmd {
 	return nil
 }
 
 // Implement Update method for ModelTree.
-func (t ModelTree[T]) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
+func (t ModelTree[N, T]) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
+	var cmds []tea.Cmd
+	var cmd tea.Cmd
+
 	switch msg := msg.(type) {
+	case Msg:
+		t.msg = string(msg)
 	case tea.KeyMsg:
 		switch msg.String() {
 		case "ctrl+c":
@@ -52,9 +58,8 @@ func (t ModelTree[T]) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			case "quit", "exit":
 				return t, tea.Quit
 			default:
-				if err := t.tree.Op(t.cmd.Value()); err != nil {
-					t.msg = err.Error()
-				}
+				t.tree, cmd = t.tree.Dispatch(t.cmd.Value())
+				cmds = append(cmds, cmd)
 			}
 			t.cmd.Reset()
 
@@ -63,16 +68,19 @@ func (t ModelTree[T]) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		}
 	}
 
-	var cmd tea.Cmd
-	t.cmd, cmd = t.cmd.Update(msg)
+	t.tree, cmd = t.tree.Update(msg)
+	cmds = append(cmds, cmd)
 
-	return t, cmd
+	t.cmd, cmd = t.cmd.Update(msg)
+	cmds = append(cmds, cmd)
+
+	return t, tea.Batch(cmds...)
 }
 
 // Implement View method for ModelTree.
-func (t ModelTree[T]) View() string {
+func (t ModelTree[N, T]) View() string {
 	return lipgloss.JoinVertical(lipgloss.Left,
-		ModelNode[T]{t.tree.Root()}.View(),
+		ModelNode[N]{t.tree.Root()}.View(),
 		t.cmd.View(),
 		t.msg,
 		"",
@@ -80,12 +88,12 @@ func (t ModelTree[T]) View() string {
 }
 
 // Define ModelNode as a generic struct to view a single node.
-type ModelNode[T Node[T]] struct {
-	node *T
+type ModelNode[N Node[N]] struct {
+	node *N
 }
 
 // Implement the View method for ModelNode.
-func (node ModelNode[T]) View() string {
+func (node ModelNode[N]) View() string {
 	style := lipgloss.NewStyle().
 		Border(lipgloss.RoundedBorder()).
 		Align(lipgloss.Center)
@@ -104,7 +112,7 @@ func (node ModelNode[T]) View() string {
 		if child != nil && !(*child).IsNil() {
 			atLeastOneChild = true
 		}
-		c := ModelNode[T]{child}.View()
+		c := ModelNode[N]{child}.View()
 		children = append(children, c)
 		widthOfChildren += lipgloss.Width(c)
 	}
@@ -117,7 +125,7 @@ func (node ModelNode[T]) View() string {
 			self,
 			lipgloss.JoinHorizontal(lipgloss.Top, children...),
 		)
-	} else {
-		return self
 	}
+
+	return self
 }
