@@ -27,12 +27,6 @@ type ErrorMsg struct {
 	error
 }
 
-func ErrMsg(msg error) tea.Cmd {
-	return func() tea.Msg {
-		return ErrorMsg{msg}
-	}
-}
-
 func ErrMsgf(msg string, a ...any) tea.Cmd {
 	return func() tea.Msg {
 		return ErrorMsg{fmt.Errorf(msg, a...)}

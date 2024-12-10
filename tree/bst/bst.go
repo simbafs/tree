@@ -36,7 +36,7 @@ func (t Tree) Dispatch(cmd string) (Tree, tea.Cmd) {
 
 		key, err := strconv.Atoi(seg[1])
 		if err != nil {
-			return t, tree.ErrMsg(err)
+			return t, tree.Cmd(err)
 		}
 
 		t.Insert(key)

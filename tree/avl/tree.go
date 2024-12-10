@@ -39,10 +39,10 @@ func (t Tree) Dispatch(cmd string) (Tree, tea.Cmd) {
 
 		key, err := strconv.Atoi(seg[1])
 		if err != nil {
-			return t, tree.ErrMsg(err)
+			return t, tree.Cmd(err)
 		}
 
-		return t, tree.ErrMsg(t.Insert(key))
+		return t, tree.Cmd(t.Insert(key))
 	case "right-rotate", "r":
 		if len(seg) < 2 {
 			return t, tree.ErrMsgf("missing key")
@@ -50,7 +50,7 @@ func (t Tree) Dispatch(cmd string) (Tree, tea.Cmd) {
 
 		node, err := searchNode(&t, seg[1])
 		if err != nil {
-			return t, tree.ErrMsg(err)
+			return t, tree.Cmd(err)
 		}
 
 		t.ReplaceNode(node.Key, node.RotateRight())
@@ -61,7 +61,7 @@ func (t Tree) Dispatch(cmd string) (Tree, tea.Cmd) {
 
 		node, err := searchNode(&t, seg[1])
 		if err != nil {
-			return t, tree.ErrMsg(err)
+			return t, tree.Cmd(err)
 		}
 
 		t.ReplaceNode(node.Key, node.RotateLeft())
@@ -72,7 +72,7 @@ func (t Tree) Dispatch(cmd string) (Tree, tea.Cmd) {
 
 		node, err := searchNode(&t, seg[1])
 		if err != nil {
-			return t, tree.ErrMsg(err)
+			return t, tree.Cmd(err)
 		}
 
 		t.ReplaceNode(node.Key, node.Balance())
