@@ -48,7 +48,7 @@ func (t Tree) Dispatch(cmd string) (Tree, tea.Cmd) {
 		}
 
 		ani := animate.New(cycle)
-		ani.Push(BalanceJob(t.root), InsertJob(key))
+		ani.Push(BalanceJob(&t.root), InsertJob(key))
 
 		return t, ani.Cmd()
 	// case "rotate", "r":
