@@ -12,3 +12,4 @@ Tree is a project to visuiallize tree like data structure
 
 -   [ ] redesign IsNil
 -   [ ] Animation
+-   [ ] An UI to select which registered tree to use
