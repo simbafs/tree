@@ -6,6 +6,12 @@ import (
 	tea "github.com/charmbracelet/bubbletea"
 )
 
+func Cmd[T any](msg T) tea.Cmd {
+	return func() tea.Msg {
+		return msg
+	}
+}
+
 type Msg string
 
 func Msgf(msg string, a ...any) tea.Cmd {

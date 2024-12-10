@@ -6,6 +6,7 @@ Tree is a project to visuiallize tree like data structure
 
 -   BST
 -   AVL
+-   B-Tree
 
 # TODO
 
