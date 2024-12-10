@@ -23,6 +23,12 @@ func NewTree() *Tree {
 	}
 }
 
+var _ tree.T = Tree{}
+
+func init() {
+	tree.Register("avl", NewTree)
+}
+
 // common methods for Tree
 
 func (t Tree) Root() *Node {
