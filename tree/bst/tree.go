@@ -21,6 +21,12 @@ func NewTree() *Tree {
 	}
 }
 
+func init() {
+	tree.Register("bst", func() tree.Tree {
+		return NewTree()
+	})
+}
+
 // common methods for Tree
 
 func (t Tree) Root() tree.Node {

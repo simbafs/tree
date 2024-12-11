@@ -25,11 +25,11 @@ type ModelTree struct {
 	msg  string
 }
 
-func New(tree Tree) ModelTree {
+func New(tree Tree) *ModelTree {
 	cmd := textinput.New()
 	cmd.Focus()
 
-	return ModelTree{
+	return &ModelTree{
 		tree: tree,
 		cmd:  cmd,
 	}

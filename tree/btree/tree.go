@@ -24,6 +24,13 @@ func NewTree(degree int) *Tree {
 	}
 }
 
+func init() {
+	tree.Register("btree", func() tree.Tree {
+		// TODO: degree should be configurable
+		return NewTree(2)
+	})
+}
+
 func (t Tree) Root() tree.Node {
 	return t.root
 }

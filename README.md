@@ -47,4 +47,4 @@ The pointer `left` and `right` of every normal node point to Nil. So you can and
 
 -   [x] redesign IsNil
 -   [ ] Animation
--   [ ] An UI to select which registered tree to use
+-   [x] An UI to select which registered tree to use

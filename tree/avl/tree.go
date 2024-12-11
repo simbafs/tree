@@ -24,7 +24,9 @@ func NewTree() *Tree {
 }
 
 func init() {
-	// tree.Register("avl", NewTree)
+	tree.Register("avl", func() tree.Tree {
+		return NewTree()
+	})
 }
 
 // common methods for Tree

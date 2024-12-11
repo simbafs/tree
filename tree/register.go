@@ -1,22 +1,22 @@
 package tree
 
-import tea "github.com/charmbracelet/bubbletea"
+var trees = map[string]func() Tree{}
 
-type T interface {
-	Root() any
-	Dispatch(string) (T, tea.Cmd)
-	Update(tea.Msg) (T, tea.Cmd)
-}
-
-var trees = map[string]func() *T{}
-
-func Register(name string, tree func() *T) {
+func Register(name string, tree func() Tree) {
 	trees[name] = tree
 }
 
-func GetTree(name string) (*T, bool) {
+func GetTreeModel(name string) (*ModelTree, bool) {
 	if t, ok := trees[name]; ok {
-		return t(), true
+		return New(t()), ok
 	}
 	return nil, false
+}
+
+func AllTrees() []string {
+	var names []string
+	for name := range trees {
+		names = append(names, name)
+	}
+	return names
 }
