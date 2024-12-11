@@ -14,9 +14,11 @@ type Node struct {
 
 	Height int
 	BF     int // balance factor
+
+	isNil bool
 }
 
-var _ tree.Node[Node] = &Node{}
+var _ tree.Node = &Node{}
 
 // common methods for Node
 
@@ -24,12 +26,12 @@ func (node Node) View() string {
 	return fmt.Sprintf("%d (h: %d, %d)", node.Key, node.Height, node.BF)
 }
 
-func (node Node) Children() []*Node {
-	return []*Node{node.Left, node.Right}
+func (node Node) Children() []tree.Node {
+	return []tree.Node{node.Left, node.Right}
 }
 
 func (node Node) IsNil() bool {
-	return node.Key == -1
+	return node.isNil
 }
 
 // custom methods for Node
@@ -37,6 +39,7 @@ func (node Node) IsNil() bool {
 var Nil = &Node{
 	Key:    -1,
 	Height: 0,
+	isNil:  true,
 }
 
 func NewNode(key int) *Node {

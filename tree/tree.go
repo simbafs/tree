@@ -7,42 +7,41 @@ import (
 )
 
 // Define Tree and Node interfaces as before.
-type Tree[N Node[N], T any] interface {
-	Root() *N
-	Dispatch(string) (T, tea.Cmd)
-	Update(tea.Msg) (T, tea.Cmd)
+type Tree interface {
+	Root() Node
+	Dispatch(string) (Tree, tea.Cmd)
 }
 
-type Node[N any] interface {
+type Node interface {
 	View() string // print the node without border
-	Children() []*N
-	IsNil() bool // for some tree like red-black tree, which include Nil node
+	Children() []Node
+	IsNil() bool
 }
 
 // Define ModelTree as a generic struct.
-type ModelTree[N Node[N], T Tree[N, T]] struct {
-	tree Tree[N, T]
+type ModelTree struct {
+	tree Tree
 	cmd  textinput.Model
 	msg  string
 }
 
-func New[N Node[N], T Tree[N, T]](tree Tree[N, T]) ModelTree[N, T] {
+func New(tree Tree) ModelTree {
 	cmd := textinput.New()
 	cmd.Focus()
 
-	return ModelTree[N, T]{
+	return ModelTree{
 		tree: tree,
 		cmd:  cmd,
 	}
 }
 
 // Implement Init method for ModelTree.
-func (t ModelTree[N, T]) Init() tea.Cmd {
+func (t ModelTree) Init() tea.Cmd {
 	return nil
 }
 
 // Implement Update method for ModelTree.
-func (t ModelTree[N, T]) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
+func (t ModelTree) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	var cmds []tea.Cmd
 	var cmd tea.Cmd
 
@@ -68,9 +67,6 @@ func (t ModelTree[N, T]) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		}
 	}
 
-	t.tree, cmd = t.tree.Update(msg)
-	cmds = append(cmds, cmd)
-
 	t.cmd, cmd = t.cmd.Update(msg)
 	cmds = append(cmds, cmd)
 
@@ -78,9 +74,9 @@ func (t ModelTree[N, T]) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 }
 
 // Implement View method for ModelTree.
-func (t ModelTree[N, T]) View() string {
+func (t ModelTree) View() string {
 	return lipgloss.JoinVertical(lipgloss.Left,
-		ModelNode[N]{t.tree.Root()}.View(),
+		ModelNode{t.tree.Root()}.View(),
 		t.cmd.View(),
 		t.msg,
 		"",
@@ -88,31 +84,31 @@ func (t ModelTree[N, T]) View() string {
 }
 
 // Define ModelNode as a generic struct to view a single node.
-type ModelNode[N Node[N]] struct {
-	node *N
+type ModelNode struct {
+	node Node
 }
 
 // Implement the View method for ModelNode.
-func (node ModelNode[N]) View() string {
+func (node ModelNode) View() string {
 	style := lipgloss.NewStyle().
 		Border(lipgloss.RoundedBorder()).
 		Align(lipgloss.Center)
 
-	if node.node == nil || (*node.node).IsNil() {
+	if node.node.IsNil() {
 		return style.Render("")
 	}
 
-	n := *node.node
+	n := node.node
 
 	atLeastOneChild := false
 	children := []string{}
 	widthOfChildren := 0
 
 	for _, child := range n.Children() {
-		if child != nil && !(*child).IsNil() {
+		if !child.IsNil() {
 			atLeastOneChild = true
 		}
-		c := ModelNode[N]{child}.View()
+		c := ModelNode{child}.View()
 		children = append(children, c)
 		widthOfChildren += lipgloss.Width(c)
 	}

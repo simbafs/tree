@@ -1,7 +1,6 @@
-package btree
+package bst
 
 import (
-	"log"
 	"strconv"
 	"strings"
 
@@ -11,21 +10,21 @@ import (
 )
 
 type Tree struct {
-	root   *Node
-	degree int
+	RootNode *Node
 }
 
 var _ tree.Tree = &Tree{}
 
-func NewTree(degree int) *Tree {
+func NewTree() *Tree {
 	return &Tree{
-		degree: degree,
-		root:   NewNode(degree),
+		RootNode: Nil,
 	}
 }
 
+// common methods for Tree
+
 func (t Tree) Root() tree.Node {
-	return t.root
+	return t.RootNode
 }
 
 func (t Tree) Dispatch(cmd string) (tree.Tree, tea.Cmd) {
@@ -37,7 +36,7 @@ func (t Tree) Dispatch(cmd string) (tree.Tree, tea.Cmd) {
 	switch seg[0] {
 	case "insert", "i":
 		if len(seg) < 2 {
-			return t, tree.ErrMsgf("%s <key>", seg[0])
+			return t, tree.ErrMsgf("insert <key>")
 		}
 
 		key, err := strconv.Atoi(seg[1])
@@ -46,31 +45,18 @@ func (t Tree) Dispatch(cmd string) (tree.Tree, tea.Cmd) {
 		}
 
 		t.Insert(key)
-		return t, nil
 	}
 
 	return t, nil
 }
 
-func (t Tree) Update(msg tea.Msg) (Tree, tea.Cmd) {
-	return t, nil
-}
-
-func (t *Tree) SplitRoot() *Node {
-	s := NewNode(t.degree)
-	// TODO: there will be a bug here
-	s.children[0] = t.root
-	t.root = s
-	s.SplitChild(0)
-	return s
-}
+// custom methods for BST
 
 func (t *Tree) Insert(key int) {
-	log.Printf("Insert %d", key)
-	r := t.root
-	if r.IsFull() {
-		r = t.SplitRoot()
+	newNode := NewNode(key)
+	if t.RootNode.IsNil() {
+		t.RootNode = newNode
+	} else {
+		t.RootNode.Insert(newNode)
 	}
-
-	r.InsertNotFull(key)
 }

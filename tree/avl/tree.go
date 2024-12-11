@@ -15,7 +15,7 @@ type Tree struct {
 	RootNode *Node
 }
 
-var _ tree.Tree[Node, Tree] = &Tree{}
+var _ tree.Tree = &Tree{}
 
 func NewTree() *Tree {
 	return &Tree{
@@ -23,19 +23,17 @@ func NewTree() *Tree {
 	}
 }
 
-var _ tree.T = Tree{}
-
 func init() {
-	tree.Register("avl", NewTree)
+	// tree.Register("avl", NewTree)
 }
 
 // common methods for Tree
 
-func (t Tree) Root() *Node {
+func (t Tree) Root() tree.Node {
 	return t.RootNode
 }
 
-func (t Tree) Dispatch(cmd string) (Tree, tea.Cmd) {
+func (t Tree) Dispatch(cmd string) (tree.Tree, tea.Cmd) {
 	seg := strings.SplitN(cmd, " ", 2)
 	switch seg[0] {
 	case "insert", "i":
@@ -88,10 +86,6 @@ func (t Tree) Dispatch(cmd string) (Tree, tea.Cmd) {
 	return t, nil
 }
 
-func (t Tree) Update(msg tea.Msg) (Tree, tea.Cmd) {
-	return t, nil
-}
-
 // custom methods for Tree
 
 func (t *Tree) Insert(key int) error {
@@ -108,7 +102,7 @@ func (t *Tree) Insert(key int) error {
 }
 
 func (t *Tree) Search(key int) *Node {
-	curr := t.Root()
+	curr := t.RootNode
 
 	for !curr.IsNil() {
 		if key == curr.Key {
@@ -124,7 +118,7 @@ func (t *Tree) Search(key int) *Node {
 }
 
 func (t *Tree) ReplaceNode(key int, node *Node) error {
-	curr := t.Root()
+	curr := t.RootNode
 	if curr.Key == key {
 		t.RootNode = node
 		return nil
@@ -155,7 +149,7 @@ func searchNode(t *Tree, str string) (*Node, error) {
 	}
 
 	node := t.Search(key)
-	if node == nil {
+	if node.IsNil() {
 		return nil, fmt.Errorf("key %d not found", key)
 	}
 

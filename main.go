@@ -5,7 +5,7 @@ import (
 	"os"
 
 	"tree/tree"
-	"tree/tree/btree"
+	"tree/tree/bst"
 
 	tea "github.com/charmbracelet/bubbletea"
 )
@@ -14,17 +14,19 @@ func main() {
 	tea.LogToFile("log.txt", "")
 
 	// avlTree := avl.NewTree()
-	// bstTree := &bst.Tree{}
-	bTree := btree.NewTree(2)
-	for _, i := range []int{1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12} { 
-		// avlTree.Insert(i)
-		// bstTree.Insert(i)
-		bTree.Insert(i)
-	}
+	bstTree := bst.NewTree()
+	// bTree := btree.NewTree(2)
+
+	// bTree := btree.NewTree(2)
+	// for _, i := range []int{1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12} {
+	// 	avlTree.Insert(i)
+	// 	// bstTree.Insert(i)
+	// 	// bTree.Insert(i)
+	// }
 
 	// model := tree.New(avlTree)
-	// model := tree.New(bstTree)
-	model := tree.New(bTree)
+	model := tree.New(bstTree)
+	// model := tree.New(bTree)
 
 	p := tea.NewProgram(model)
 	if _, err := p.Run(); err != nil {

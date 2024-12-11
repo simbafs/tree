@@ -12,17 +12,28 @@ type Node struct {
 	len      int // the number of keys int the node
 	keys     []int
 	children []*Node
+	isNil    bool
 }
 
-var _ tree.Node[Node] = &Node{}
+var _ tree.Node = &Node{}
+
+var Nil = &Node{
+	isNil: true,
+}
 
 func NewNode(degree int) *Node {
-	return &Node{
+	node := &Node{
 		degree:   degree,
 		len:      0,
 		keys:     make([]int, 2*degree-1),
 		children: make([]*Node, 2*degree),
 	}
+
+	for i := 0; i < 2*degree; i++ {
+		node.children[i] = Nil
+	}
+
+	return node
 }
 
 func (n Node) View() string {
@@ -34,17 +45,21 @@ func (n Node) View() string {
 	return s
 }
 
-func (n Node) Children() []*Node {
-	return n.children[:n.len+1]
+func (n Node) Children() []tree.Node {
+	children := make([]tree.Node, n.len+1)
+	for i := 0; i < n.len+1; i++ {
+		children[i] = n.children[i]
+	}
+	return children
 }
 
 func (n Node) IsNil() bool {
-	return false
+	return n.isNil
 }
 
 func (n *Node) IsLeaf() bool {
 	for _, c := range n.children {
-		if c != nil {
+		if c != Nil {
 			return false
 		}
 	}
