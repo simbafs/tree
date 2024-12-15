@@ -123,3 +123,35 @@ func (n *Node) Balance() *Node {
 	}
 	return n
 }
+
+func (n *Node) Delete(key int) (*Node, error) {
+	var err error
+	if n.IsNil() {
+		err = fmt.Errorf("key %d not found", key)
+	} else if key < n.Key {
+		n.Left, err = n.Left.Delete(key)
+	} else if key > n.Key {
+		n.Right, err = n.Right.Delete(key)
+	} else {
+		if n.Left.IsNil() {
+			return n.Right, nil
+		} else if n.Right.IsNil() {
+			return n.Left, nil
+		}
+
+		// find the smallest node in the right subtree
+		min := n.Right
+		for !min.Left.IsNil() {
+			min = min.Left
+		}
+
+		// replace the current node with the smallest node
+		n.Key = min.Key
+		n.Right, err = n.Right.Delete(min.Key)
+	}
+
+	n.UpdateHeight()
+	n = n.Balance()
+
+	return n, err
+}

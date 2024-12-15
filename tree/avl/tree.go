@@ -49,6 +49,17 @@ func (t Tree) Dispatch(cmd string) (tree.Tree, tea.Cmd) {
 		}
 
 		return t, tree.Cmd(t.Insert(key))
+	case "delete", "d":
+		if len(seg) < 2 {
+			return t, tree.ErrMsgf("missing key")
+		}
+
+		key, err := strconv.Atoi(seg[1])
+		if err != nil {
+			return t, tree.Cmd(err)
+		}
+
+		return t, tree.Cmd(t.Delete(key))
 	case "right-rotate", "r":
 		if len(seg) < 2 {
 			return t, tree.ErrMsgf("missing key")
@@ -117,6 +128,16 @@ func (t *Tree) Search(key int) *Node {
 	}
 
 	return nil
+}
+
+func (t *Tree) Delete(key int) error {
+	if t.RootNode.IsNil() {
+		return fmt.Errorf("key %d not found", key)
+	}
+
+	var err error
+	t.RootNode, err = t.RootNode.Delete(key)
+	return err
 }
 
 func (t *Tree) ReplaceNode(key int, node *Node) error {
